@@ -1,1 +1,4 @@
-pip install pynput sounddevice numpy
+#!/usr/bin/env sh
+set -eu
+
+./build.sh

@@ -5,7 +5,7 @@ Build a playable **polyphonic sine-wave synth prototype** called Accordinez usin
 
 ## Core Behavior
 
-### 1) Left-Hand Chord-Scale Bank (`a w s e d r f`)
+### 1) Left-Hand Chord-Scale Bank (`a w s e d r f g`)
 These keys select the active chord-scale context:
 
 - `a` -> C ionian
@@ -15,6 +15,7 @@ These keys select the active chord-scale context:
 - `d` -> G mixolydian
 - `r` -> A aeolian
 - `f` -> B locrian
+- `g` -> E custom (E F G# A B C D)
 
 Important behavior:
 - Switching bank is **lazy** for right-hand notes.
@@ -70,6 +71,7 @@ CHORD_SCALE_BANKS = {
     "d": {"name": "G mixolydian", "degrees": [67, 69, 71, 72, 74, 76, 77]},
     "r": {"name": "A aeolian", "degrees": [57, 59, 60, 62, 64, 65, 67]},
     "f": {"name": "B locrian", "degrees": [59, 60, 62, 64, 65, 67, 69]},
+    "g": {"name": "E custom", "degrees": [64, 65, 68, 69, 71, 72, 74]},
 }
 ```
 
@@ -83,7 +85,7 @@ RIGHT_HAND_KEYS = {
 
 ## State Model
 
-- `active_bank_key`: current selected left-hand bank (`a/w/s/e/d/r/f`)
+- `active_bank_key`: current selected left-hand bank (`a/w/s/e/d/r/f/g`)
 - `octave_offset`: integer semitone offset (default `0`, changed by `c`/`v`)
 - `pitch_shift_active`: bool for `t` hold state
 - `held_right_keys`: set of currently held right-hand keyboard keys
@@ -106,7 +108,7 @@ RIGHT_HAND_KEYS = {
 1. Release only that voice.
 2. Other sustained voices remain unchanged.
 
-### Bank switch (`a/w/s/e/d/r/f`)
+### Bank switch (`a/w/s/e/d/r/f/g`)
 1. Update `active_bank_key`.
 2. Do **not** retune existing voices.
 3. Future right-hand note-ons use new bank.

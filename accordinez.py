@@ -29,8 +29,9 @@ CHORD_SCALE_BANKS = {
     "s": {"name": "E phrygian", "degrees": [64, 65, 67, 69, 71, 72, 74]},
     "e": {"name": "F lydian", "degrees": [65, 67, 69, 71, 72, 74, 76]},
     "d": {"name": "G mixolydian", "degrees": [67, 69, 71, 72, 74, 76, 77]},
-    "r": {"name": "A aeolian", "degrees": [57, 59, 60, 62, 64, 65, 67]},
-    "f": {"name": "B locrian", "degrees": [59, 60, 62, 64, 65, 67, 69]},
+    "r": {"name": "A aeolian", "degrees": [69, 71, 72, 74, 76, 77, 79]},
+    "f": {"name": "B locrian", "degrees": [71, 72, 74, 76, 77, 79, 81]},
+    "g": {"name": "E custom", "degrees": [64, 65, 68, 69, 71, 72, 74]},
 }
 
 RIGHT_HAND_KEYS = {
@@ -280,7 +281,7 @@ class Accordinez:
 
     def run(self) -> None:
         print("Accordinez running (polyphonic sine-wave synth).")
-        print("Left hand: a/w/s/e/d/r/f (bank), t (+1 semitone hold), c/v (oct down/up).")
+        print("Left hand: a/w/s/e/d/r/f/g (bank), t (+1 semitone hold), c/v (oct down/up).")
         print("Right hand: j i k o l p ; mapped to degrees 1..7.")
         print("Press Ctrl+C to exit.")
 

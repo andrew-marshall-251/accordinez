@@ -12,6 +12,7 @@ Usage:
 from __future__ import annotations
 
 import signal
+import os
 import sys
 import threading
 from dataclasses import dataclass
@@ -19,7 +20,14 @@ from typing import Dict, Optional, Set
 
 import numpy as np
 import sounddevice as sd
-from pynput import keyboard
+
+try:
+    from pynput import keyboard
+except ImportError as exc:
+    keyboard = None
+    KEYBOARD_IMPORT_ERROR: Optional[ImportError] = exc
+else:
+    KEYBOARD_IMPORT_ERROR = None
 
 
 # Global chord-scale bank definition (requested for easy top-level access).
@@ -129,6 +137,7 @@ class Accordinez:
         self.running = True
 
         self.synth = SineSynth(self._voices_ref, self.lock)
+        self.synth_started = False
 
     def _voices_ref(self) -> Dict[str, Voice]:
         return self.voices_by_right_key
@@ -277,15 +286,37 @@ class Accordinez:
         if self.listener is not None:
             self.listener.stop()
 
-        self.synth.stop()
+        if self.synth_started:
+            self.synth.stop()
+            self.synth_started = False
 
     def run(self) -> None:
+        if keyboard is None:
+            print("Accordinez cannot start keyboard input.")
+            print("The pynput keyboard backend failed to initialize:")
+            print(f"  {KEYBOARD_IMPORT_ERROR}")
+            if sys.platform.startswith("linux"):
+                print()
+                print("Linux note: Accordinez currently uses pynput's global keyboard listener.")
+                print("That backend requires an X11 session. It usually cannot read keys under Wayland.")
+                print("Try logging into an Xorg/X11 session, or run from a terminal with DISPLAY set.")
+            return
+
+        if sys.platform.startswith("linux"):
+            session_type = os.environ.get("XDG_SESSION_TYPE", "").lower()
+            if session_type == "wayland" or (os.environ.get("WAYLAND_DISPLAY") and not os.environ.get("DISPLAY")):
+                print("Warning: this looks like a Wayland Linux session.")
+                print("pynput keyboard listeners often cannot receive key events under Wayland.")
+                print("If keys do nothing, log into an Xorg/X11 session and run Accordinez there.")
+                print()
+
         print("Accordinez running (polyphonic sine-wave synth).")
         print("Left hand: a/w/s/e/d/r/f/g (bank), t (+1 semitone hold), c/v (oct down/up).")
         print("Right hand: j i k o l p ; mapped to degrees 1..7.")
         print("Press Ctrl+C to exit.")
 
         self.synth.start()
+        self.synth_started = True
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
         self.listener.join()
